@@ -60,7 +60,7 @@ Add addresses:
 /ip firewall address-list add list=proxy address=149.154.160.0/20
 ...
 ```
-Or use the RouterOS script below, just add/replace the required domains.
+Or use the RouterOS script below, just add/replace the required domains(ip addreses or ip subnets).
 ```lua
 :local proxyListName "proxy"
 :local proxyCommentText "Google"
@@ -271,7 +271,7 @@ chmod +x /root/singbox-route-sync.sh
 ...
 ```
 
-Или используйте скрипт для RouterOS ниже, только добавьте/замените необходимые домены.
+Или используйте скрипт для RouterOS ниже, только добавьте/замените необходимые домены(ip адрес или ip подсети).
 
 ```lua
 :local proxyListName "proxy"
