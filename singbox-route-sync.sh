@@ -1,4 +1,23 @@
 #!/bin/bash
+#
+# singbox-route-sync
+#
+# Description:
+#   Synchronizes IP addresses and subnets from a MikroTik Firewall Address-List
+#   and updates Linux routing rules to forward selected traffic through the
+#   sing-box TUN interface (singbox0). Designed for setups where MikroTik
+#   marks traffic and forwards it to a Linux gateway running sing-box.
+#
+# Author: fsdevcom2000
+# GitHub: https://github.com/fsdevcom2000/singbox-route-sync
+#
+# License: MIT
+#
+# Notes:
+#   - Requires sshpass for non-interactive SSH authentication.
+#   - Intended to run via cron every 30 minutes.
+#   - Logs are written to /var/log/singbox-route-sync.log.
+#
 
 LOGFILE="/var/log/singbox-route-sync.log"
 MIKROTIK_HOST="192.168.0.1"
