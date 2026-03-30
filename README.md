@@ -60,6 +60,36 @@ Add addresses:
 /ip firewall address-list add list=proxy address=149.154.160.0/20
 ...
 ```
+Or use the RouterOS script below, just add/replace the required domains.
+```lua
+:local proxyListName "proxy"
+:local proxyCommentText "Google"
+:local domains {
+    "google.com"
+    "youtube.com"
+    "mail.google.com"
+}
+
+:foreach domain in=$domains do={
+    :local resolved [:resolve $domain]
+    :if ([:len $resolved] > 0) do={
+        # Check if IP address in list
+        :local exists [/ip firewall address-list find list=$proxyListName address=$resolved]
+        :if ([:len $exists] = 0) do={
+            /ip firewall address-list add list=$proxyListName address=$resolved comment="$proxyCommentText"
+            :log info "Added: $domain -> $resolved"
+        } else={
+            :log info "Skipped: $domain -> $resolved (already exists)"
+        }
+    } else={
+        :log warning "Failed to resolve: $domain"
+    }
+}
+
+:log info "Domains processing completed"
+```
+- `proxyListName` - address list name
+- `proxyCommentText` - Comments
 
 ## Cron automation
 
@@ -240,6 +270,40 @@ chmod +x /root/singbox-route-sync.sh
 /ip firewall address-list add list=proxy address=149.154.160.0/20
 ...
 ```
+
+Или используйте скрипт для RouterOS ниже, только добавьте/замените необходимые домены.
+
+```lua
+:local proxyListName "proxy"
+:local proxyCommentText "Google"
+:local domains {
+    "google.com"
+    "youtube.com"
+    "mail.google.com"
+}
+
+:foreach domain in=$domains do={
+    :local resolved [:resolve $domain]
+    :if ([:len $resolved] > 0) do={
+        # Check if IP address in list
+        :local exists [/ip firewall address-list find list=$proxyListName address=$resolved]
+        :if ([:len $exists] = 0) do={
+            /ip firewall address-list add list=$proxyListName address=$resolved comment="$proxyCommentText"
+            :log info "Added: $domain -> $resolved"
+        } else={
+            :log info "Skipped: $domain -> $resolved (already exists)"
+        }
+    } else={
+        :log warning "Failed to resolve: $domain"
+    }
+}
+
+:log info "Domains processing completed"
+```
+
+- `proxyListName` - имя списка
+- `proxyCommentText` - комментарий
+
 
 ## Автозапуск через cron
 
