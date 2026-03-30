@@ -141,6 +141,43 @@ Where:
 - The server then routes it through the `singbox0` interface into the tunnel.
 - Return traffic flows normally, ensuring proper bidirectional connectivity.
 ---
+
+## Enabling IP forwarding
+
+Linux server must be allowed to forward packets between interfaces (Router → singbox0).
+
+Check:
+
+```
+sysctl net.ipv4.ip_forward
+```
+
+Enable if needed:
+
+```
+echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+sysctl -p
+```
+
+## Minimal firewall example
+
+```
+table inet filter {
+    chain input { type filter hook input priority filter; policy accept; }
+    chain forward { type filter hook forward priority filter; policy accept; }
+    chain output { type filter hook output priority filter; policy accept; }
+}
+
+table ip nat {
+}
+```
+### Why is this necessary?
+
+- The MikroTik router sends traffic to the server.
+- The server must be able to forward it to the 'singbox0' interface.
+- Without forwarding, packets simply die at the input.
+---
+
 # 🇷🇺 README (Russian)
 
 ## Автоматическая синхронизация маршрутов sing-box с MikroTik Address‑List
@@ -285,3 +322,40 @@ add chain=prerouting src-address-list=proxy action=mark-routing new-routing-mark
 - Маршрут с этой меткой отправляет пакет на Linux‑сервер.
 - Скрипт на сервере обновляет маршруты и направляет трафик через sing-box.
 - Ответ приходит обратно по стандартному маршруту.
+
+---
+## Включение IP‑forwarding
+
+Linux должен уметь пересылать пакеты между интерфейсами (MikroTik → singbox0). Это обязательный шаг.
+
+Проверка:
+
+```
+sysctl net.ipv4.ip_forward
+```
+
+Если значение `0`, включите:
+
+```
+echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+sysctl -p
+```
+
+## Минимальная настройка Firewall
+
+```
+table inet filter {
+    chain input { type filter hook input priority filter; policy accept; }
+    chain forward { type filter hook forward priority filter; policy accept; }
+    chain output { type filter hook output priority filter; policy accept; }
+}
+
+table ip nat {
+}
+```
+
+### Зачем это нужно
+
+- Роутер MikroTik отправляет трафик на сервер.
+- Сервер должен уметь пересылать его в интерфейс `singbox0`.
+- Без forwarding пакеты просто «умирают» на входе.
