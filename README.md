@@ -60,7 +60,7 @@ Add addresses:
 /ip firewall address-list add list=proxy address=149.154.160.0/20
 ...
 ```
-Or use the RouterOS script below, just add/replace the required domains(ip addreses or ip subnets).
+Or use the RouterOS scripts below, just add/replace the required domains(ip addreses or ip subnets).
 ```lua
 :local proxyListName "proxy"
 :local proxyCommentText "Google"
@@ -88,6 +88,39 @@ Or use the RouterOS script below, just add/replace the required domains(ip addre
 
 :log info "Domains processing completed"
 ```
+
+```lua
+# Configuration
+:local proxyListName "proxy"
+:local proxyCommentText "Static Import"
+
+# List of ip addresses or subnets
+:local targets {
+    "1.1.1.1";
+    "8.8.8.8";
+    "104.16.0.0/12";
+    "142.250.0.0/15"
+}
+
+:log info "Starting static IP/Subnet processing..."
+
+:foreach net in=$targets do={
+    # Check if such an address or subnet already exists in the list
+    :local exists [/ip firewall address-list find list=$proxyListName address=$net]
+    
+    :if ([:len $exists] = 0) do={
+        # If not found, add
+        /ip firewall address-list add list=$proxyListName address=$net comment=$proxyCommentText
+        :log info ("Added to list '$proxyListName': " . $net)
+    } else={
+        # If found, we do nothing. (Enable logging for debugging.)
+        #:log info ("Skipped: " . $net . " already exists")
+    }
+}
+
+:log info "Static IP/Subnet processing completed"
+```
+
 - `proxyListName` - address list name
 - `proxyCommentText` - Comments
 
@@ -271,7 +304,7 @@ chmod +x /root/singbox-route-sync.sh
 ...
 ```
 
-Или используйте скрипт для RouterOS ниже, только добавьте/замените необходимые домены(ip адрес или ip подсети).
+Или используйте скрипты для RouterOS ниже, только добавьте/замените необходимые домены(ip адрес или подсети).
 
 ```lua
 :local proxyListName "proxy"
@@ -301,6 +334,37 @@ chmod +x /root/singbox-route-sync.sh
 :log info "Domains processing completed"
 ```
 
+```lua
+# Configuration
+:local proxyListName "proxy"
+:local proxyCommentText "Static Import"
+
+# List of ip addresses or subnets
+:local targets {
+    "1.1.1.1";
+    "8.8.8.8";
+    "104.16.0.0/12";
+    "142.250.0.0/15"
+}
+
+:log info "Starting static IP/Subnet processing..."
+
+:foreach net in=$targets do={
+    # Check if such an address or subnet already exists in the list
+    :local exists [/ip firewall address-list find list=$proxyListName address=$net]
+    
+    :if ([:len $exists] = 0) do={
+        # If not found, add
+        /ip firewall address-list add list=$proxyListName address=$net comment=$proxyCommentText
+        :log info ("Added to list '$proxyListName': " . $net)
+    } else={
+        # If found, we do nothing. (Enable logging for debugging.)
+        #:log info ("Skipped: " . $net . " already exists")
+    }
+}
+
+:log info "Static IP/Subnet processing completed"
+```
 - `proxyListName` - имя списка
 - `proxyCommentText` - комментарий
 
